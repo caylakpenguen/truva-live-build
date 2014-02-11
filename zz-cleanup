@@ -1,0 +1,149 @@
+#!/bin/bash
+
+if [ "$1" != "" ]; then
+   cd $1
+else
+   echo parameter required
+   exit 1
+fi
+
+function move_to_devel()
+{
+   while [ "$1" != "" ]; do
+      SOURCE="$(readlink -f $1)"
+      DESTINATION="../006-devel/$1"
+ 
+      if [ "$(echo $SOURCE | grep devel)" = "" ]; then
+         mkdir -p "$(dirname $DESTINATION)"
+         cp -af $SOURCE "$(dirname $DESTINATION)"
+         rm -Rf "$SOURCE"
+
+         if [ -d "$DESTINATION" ]; then
+            mkdir -p "$SOURCE"
+         fi
+      fi
+   shift
+   done
+}
+
+CURRENT=$(basename $(pwd))
+
+find -name ".wh.*" | xargs rm -Rf
+rmdir mnt/*
+rmdir media/*
+rm -f media/*
+rm -f mnt/README
+rm -f boot/*
+rm -f usr/lib/alsa-lib/smixer/smixer-python.*
+rm -Rf usr/doc/*
+rm -Rf usr/man/{?????,??,??_??}
+rm -Rf {var,usr}/man/cat* usr/local/man/cat* # NOCACHE
+rm -f usr/man/man{2,3,4,6,9}/*
+rm -f usr/man/man1/perl?*
+rm -f usr/man/* # all files and links but no directories
+rm -f usr/info/*
+
+find usr/share/locale -name "*.mo" | xargs rm
+find usr/share/locale -name "LC_MESSAGES" | xargs rmdir
+find usr/share/locale | xargs rmdir
+rm -Rf usr/lib/locale/
+
+rm -f  etc/rc.d/rc1.d/SlaxDrive* # this is done in rc.slax already
+rm -f  usr/share/sounds/KDE_*
+rm -f  usr/share/cups/calibrate.ppm
+rm -f  usr/share/cups/model/gutenprint/*/*.gz
+rm -f  usr/share/gutenprint/samples/profile.jpg
+rm -Rf usr/share/gutenprint/doc
+rm -Rf usr/share/icons/{Locolor,Technical,ikons,kdeclassic,locolor,slick}
+rm -Rf usr/share/icons/crystalsvg/{128x128,scalable}
+rm -Rf usr/share/apps/kmdr-editor
+rm -Rf usr/bin/kmdr-editor
+rm -Rf usr/share/apps/kpersonalizer
+rm -Rf usr/share/apps/kopete/styles/Konqi
+rm -Rf $(ls -aA1bd usr/share/apps/carddecks/* 2>/dev/null | grep cards | grep -v default)
+rm -Rf usr/lib/qt/phrasebooks
+rm -Rf usr/lib/qt/doc
+rm -Rf usr/lib/qt/translations
+rm -Rf usr/include/c++/*/i486-slackware-linux/bits/{stdc++.h.gch,stdtr1c++.h.gch}
+
+# Unzip gzipped man pages, so LZMA can compress 2times better.
+# First we gunzip symlinks, which will be overwritten by the content of targets
+# this doesn't matter as mksquashfs will handle duplicate files correctly
+find usr/man -type l -name "*.gz" | xargs gunzip -f
+find usr/man -name "*.gz" | xargs gunzip
+
+# the following would cause bad dependencies:
+rm -f usr/bin/xtotroff
+rm -f usr/bin/gxditview
+rm -f usr/bin/memusagestat
+rm -f usr/lib/perl5/*/*/i486-linux-thread-multi/auto/DBD/mysql/mysql.so
+rm -f usr/lib/qt/plugins/sqldrivers/libqsqlmysql.so
+rm -f usr/lib/gettext/gnu.gettext.GetURL
+rm -f usr/lib/gettext/gnu.gettext.DumpResource
+rm -f usr/lib/xmms/Input/libxmms*
+
+# we don't have python at all! I hate python dependencies
+find -name "*.py" | xargs rm -f
+rm -f usr/bin/hal-device-manager
+rm -f usr/bin/libglade-convert
+rm -f usr/bin/rsvg
+rm -f usr/src/linux-2.6.*/scripts/bloat-o-meter
+rm -f usr/src/linux-2.6.*/scripts/show_delta
+rm -f usr/src/linux-2.6.*/scripts/diffconfig
+
+# Slax's Koffice is pretty stripped and doesn't have krita, kexi, etc.
+rm -f usr/lib/kde3/libkspreadkexiimport.so
+rm -f usr/lib/kde3/libkritapngimport.so
+rm -f usr/lib/kde3/libkritapngexport.so
+rm -f usr/lib/kde3/libkritajpegimport.so
+rm -f usr/lib/kde3/libkritajpegexport.so
+rm -f usr/lib/kde3/libkritatiffimport.so
+rm -f usr/lib/kde3/libkritatiffexport.so
+rm -f usr/lib/kde3/libkrita_raw_import.so
+rm -f usr/lib/kde3/libkivioimageexport.so
+
+
+rm -f  usr/lib/qt/plugins/{styles,designer}/*
+rm -f  usr/lib/qt/lib/libdesignercore.*
+rm -f  usr/lib/qt/lib/libeditor.*
+rm -f  var/log/packages/glibc-i18n* # this is installed, but then entirely removed (after all lang modules are built)
+rm -f  var/spool/mail/*
+rm -Rf usr/X11R6.bak
+rm -Rf usr/lib/perl5/*/i486-linux/auto/Encode/{CN,JP,KR,TW}
+rm -Rf usr/lib/gimp/*
+rm -Rf usr/share/gtk-doc
+rm -Rf usr/share/gtk-2.0/demo
+rm -Rf usr/share/lynx/lynx_{doc,help}
+rm -Rf usr/share/apps/kthememanager/themes/*
+rm -Rf usr/share/apps/k3b/pics/{73lab,RobsTheme,quant}/*
+rm -Rf usr/share/apps/k3b/pics/73lab/*
+rm -Rf usr/share/apps/konqueror/tiles/*
+rm -Rf usr/share/apps/kdesktop/pics/*
+rm -Rf usr/share/apps/kicker/tiles/*
+rm -Rf usr/share/apps/kdm/*
+rm -Rf usr/share/apps/k3b/extra/*
+rm -Rf usr/share/apps/ksplash/*
+rm -Rf usr/share/apps/noatun/skins/*
+rm -Rf usr/share/wallpapers/*
+rm -f  usr/share/gettext/archive.tar.gz
+rm -f  usr/bin/gtk-builder-convert
+rm -f  usr/bin/libglade-convert
+rm -f  usr/bin/rsvg
+rm -f  usr/src/linux/scripts/bloat-o-meter
+rm -f  usr/src/linux/scripts/show_delta
+
+# slackware bug causes these to be installed in root
+rm fonts.dir
+rm fonts.scale
+
+# move sources/includes to devel module
+move_to_devel usr/include
+move_to_devel usr/lib/qt-3.*/include
+move_to_devel usr/lib/qt-3.*/mkspecs
+move_to_devel usr/lib/qt-3.*/bin/moc
+move_to_devel $(find -xdev -name "*.a")
+
+# fix slackware = I don't need these files to be in Slax at all
+# Slackware includes it in aaa_elflibs, it brings unneeded dependencies
+rm  -f usr/lib/libcurl.so.4*
+rm  -f usr/bin/ogg123

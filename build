@@ -1,0 +1,84 @@
+#!/bin/bash
+
+if [ "$(uname -m)" = "x86_64" ]; then
+   SLACKWARE=/mnt/d/slackware/slackware64-current/slackware64/
+   SLAX=/mnt/sdb1/packages/64bit
+else
+   SLACKWARE=/mnt/d/slackware/slackware-current/slackware/
+   SLAX=/mnt/sdb1/packages/32bit
+fi
+
+LIVEKIT=/mnt/sdb1/linux-live
+EMPTY=/tmp/truva-empty
+UNION=/tmp/truva-union
+
+#-- umount $UNION 2>/dev/null
+#-- rm -Rf $UNION
+mkdir -p $UNION
+
+#-- umount $EMPTY 2>/dev/null
+#-- rm -Rf $EMPTY
+mkdir -p $EMPTY
+
+# Install pakcage from Slackware pkg tree
+# $1 = package name to install
+# $2 = source tree to search for package
+# $3 = target root
+#
+sinstall()
+{
+   local PKG
+   PKG="$(find "$2" | egrep "/$1-[^-]+-[^-]+-[^-]+[.]t[gx]z\$" | head -n 1)"
+
+   if [ "$PKG" = "" ]; then
+      echo -ne "\\nError! Package $1 not found!\\n"
+   else
+      echo Installing $PKG
+      installpkg -root "$3" "$PKG"
+   fi
+}
+
+# change union target storage to $1
+# work on union mount $2
+#
+union_target_set()
+{
+   rm -Rf "$1"
+   mkdir -p "$1"
+   mount -o remount,mod:$(cat /sys/fs/aufs/*/br0 | sed -r "s/=.*//")=ro none "$2" 2>/dev/null
+   mount -o remount,add:0:"$1" none "$2"
+}
+
+# setup union
+
+#--modprobe aufs
+#--mount -t tmpfs tmpfs $EMPTY
+#--mount -t aufs -o xino="$EMPTY/.xino",br="$EMPTY" none "$UNION"
+
+# install all packages for bundles
+
+
+   cat ./bundles/001-core/pkglist | while read LINE; do
+      SRC="$(echo "$LINE" | cut -d: -f 1)"
+      PKG="$(echo "$LINE" | cut -d: -f 2)"
+
+      if [ "$SRC" = "slackware" ]; then
+         sinstall "$PKG" "$SLACKWARE" "$UNION"
+      fi
+
+      if [ "$SRC" = "truva" ]; then
+         sinstall "$PKG" "$SLAX" "$UNION"
+      fi
+   done
+
+#   cp -a ./bundles/*/rootfs/* "$UNION"
+#-- sh ./bundles/$i/doinst.sh "$UNION"
+
+#-- mount "$UNION"
+#-- mount "$EMPTY"
+
+#-- for i in $(ls -1 bundles | sort); do
+#--   ./reduce /tmp/$i
+#--   rm /tmp/$i.sb
+#--   mksquashfs /tmp/$i /tmp/$i.sb -comp xz -b 512k
+#-- done
