@@ -2,10 +2,10 @@
 
 if [ "$(uname -m)" = "x86_64" ]; then
    SLACKWARE=/mnt/d/slackware/slackware64-current/slackware64/
-   SLAX=/mnt/sdb1/packages/64bit
+   TRUVA=/mnt/sdb1/packages/64bit
 else
    SLACKWARE=/mnt/d/slackware/slackware-current/slackware/
-   SLAX=/mnt/sdb1/packages/32bit
+   TRUVA=/mnt/sdb1/packages/32bit
 fi
 
 LIVEKIT=/mnt/sdb1/linux-live
@@ -41,13 +41,6 @@ sinstall()
 # change union target storage to $1
 # work on union mount $2
 #
-union_target_set()
-{
-   rm -Rf "$1"
-   mkdir -p "$1"
-   mount -o remount,mod:$(cat /sys/fs/aufs/*/br0 | sed -r "s/=.*//")=ro none "$2" 2>/dev/null
-   mount -o remount,add:0:"$1" none "$2"
-}
 
 # setup union
 
@@ -74,8 +67,6 @@ union_target_set()
 #   cp -a ./bundles/*/rootfs/* "$UNION"
 #-- sh ./bundles/$i/doinst.sh "$UNION"
 
-#-- mount "$UNION"
-#-- mount "$EMPTY"
 
 #-- for i in $(ls -1 bundles | sort); do
 #--   ./reduce /tmp/$i
