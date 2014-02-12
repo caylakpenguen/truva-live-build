@@ -1,14 +1,8 @@
-slackware:ConsoleKit
-slackware:MPlayer
-slackware:ModemManager
-slackware:PyQt
 slackware:aaa_base
 slackware:aaa_elflibs
 slackware:aaa_terminfo
-slackware:abiword
 slackware:acl
 slackware:acpid
-slackware:akonadi
 slackware:alsa-lib
 slackware:alsa-oss
 slackware:alsa-utils
@@ -266,7 +260,7 @@ slackware:mobile-broadband-provider-info
 slackware:most
 slackware:mozilla-firefox
 slackware:mozilla-nss
-slackware:mozilla-thunderbird
+#slackware:mozilla-thunderbird
 slackware:mpfr
 slackware:mplayerthumbs
 slackware:mt-st
@@ -517,3 +511,6 @@ slackware:yasm
 slackware:zd1211-firmware
 slackware:zlib
 slackware:zoo
+slackware:ConsoleKit
+slackware:PyQt
+#slackware:abiword
