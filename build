@@ -60,7 +60,7 @@ sinstall()
       fi
 
       if [ "$SRC" = "truva" ]; then
-         sinstall "$PKG" "$SLAX" "$UNION"
+         sinstall "$PKG" "$TRUVA" "$UNION"
       fi
    done
 
