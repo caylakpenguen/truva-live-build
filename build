@@ -34,7 +34,7 @@ sinstall()
       echo -ne "\\nError! Package $1 not found!\\n"
    else
       echo Installing $PKG
-      installpkg -root "$3" "$PKG"
+      installpkg -root "$3" "$PKG" >/dev/null
    fi
 }
 
