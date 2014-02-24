@@ -4,13 +4,13 @@ if [ "$(uname -m)" = "x86_64" ]; then
    SLACKWARE=/mnt/d/slackware/slackware64-current/slackware64/
    TRUVA=/mnt/sdb1/packages/64bit
 else
-   SLACKWARE=/mnt/d/slackware/slackware-current/slackware/
+   SLACKWARE=/cdrom/slackware/
    TRUVA=/mnt/sdb1/packages/32bit
 fi
 
 LIVEKIT=/mnt/sdb1/linux-live
 EMPTY=/tmp/truva-empty
-UNION=/tmp/truva-union
+UNION=/hedef
 
 #-- umount $UNION 2>/dev/null
 #-- rm -Rf $UNION
@@ -42,16 +42,21 @@ sinstall()
 # work on union mount $2
 #
 
-# setup union
-
-#--modprobe aufs
-#--mount -t tmpfs tmpfs $EMPTY
-#--mount -t aufs -o xino="$EMPTY/.xino",br="$EMPTY" none "$UNION"
+union_target_set()
+{
+   rm -Rf "$1"
+   mkdir -p "$1"
+#    mount -o remount,mod:$(cat /sys/fs/aufs/*/br0 | sed -r "s/=.*//")=ro none "$2" 2>/dev/null
+#    mount -o remount,add:0:"$1" none "$2"
+}
 
 # install all packages for bundles
 
 
-   cat ./bundles/001-core/pkglist | while read LINE; do
+for i in $(ls -1 bundles | sort); do
+   union_target_set /tmp/$i "$UNION"
+
+   cat ./bundles/$i/pkglist | while read LINE; do
       SRC="$(echo "$LINE" | cut -d: -f 1)"
       PKG="$(echo "$LINE" | cut -d: -f 2)"
 
@@ -59,34 +64,20 @@ sinstall()
          sinstall "$PKG" "$SLACKWARE" "$UNION"
       fi
 
-      if [ "$SRC" = "truva" ]; then
+if [ "$SRC" = "truva" ]; then
          sinstall "$PKG" "$TRUVA" "$UNION"
       fi
    done
-
-#   cp -a ./bundles/*/rootfs/* "$UNION"
-#-- sh ./bundles/$i/doinst.sh "$UNION"
-
-
-#-- for i in $(ls -1 bundles | sort); do
-#--   ./reduce /tmp/$i
-#--   rm /tmp/$i.sb
-#--   mksquashfs /tmp/$i /tmp/$i.sb -comp xz -b 512k
-#-- done
-paketle(){
-for dir in `ls -1`; do
-    if [ -d $dir ]; then
-      echo "$dir.sb ..."
-      echo -ne > exclude.txt
-      for i in $EXCLUDE; do
-         part=$(echo "x/$i" | tr -s / | sed -r "s:x/[^/]+/::")
-         if [ -e "$ROOT/$dir/$part" ]; then echo "$ROOT/$dir/$part" >> exclude.txt; fi
-      done
-      cat exclude.txt
-      dir2sb $dir /media/ESKI/hedef/$dir.sb -keep-as-directory -ef exclude.txt
-      if [ $? -ne 0 ]; then exit; fi
-      rm exclude.txt
-      echo
-    fi
+   
+#    cp -a ./bundles/$i/rootfs/* "$UNION"
+#    sh ./bundles/$i/doinst.sh "$UNION"
 done
-}
+
+# ----------------------
+
+# make squashfs images
+for i in $(ls -1 bundles | sort); do
+   mksquashfs /tmp/$i /tmp/$i.sb -comp xz -Xbcj x86 -b 512k
+done
+
+
