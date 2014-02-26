@@ -74,10 +74,12 @@ if [ "$SRC" = "truva" ]; then
 done
 
 # ----------------------
-
+mkdir -p  /home/moduller
+cd $UNION
 # make squashfs images
-for i in $(ls -1 bundles | sort); do
-   mksquashfs /tmp/$i /tmp/$i.sb -comp xz -Xbcj x86 -b 512k
+for i in $(ls -1 | sort); do
+   mksquashfs $i /home/moduller/$i.sb -comp xz -Xbcj x86 -b 512k
 done
 
+echo islem Tamamlandı ->> `date`
 
