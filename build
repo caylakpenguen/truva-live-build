@@ -54,18 +54,18 @@ union_target_set()
 
 
 for i in $(ls -1 bundles | sort); do
-   union_target_set /tmp/$i "$UNION"
+   mkdir -p "$UNION/$i"
 
    cat ./bundles/$i/pkglist | while read LINE; do
       SRC="$(echo "$LINE" | cut -d: -f 1)"
       PKG="$(echo "$LINE" | cut -d: -f 2)"
 
       if [ "$SRC" = "slackware" ]; then
-         sinstall "$PKG" "$SLACKWARE" "$UNION"
+         sinstall "$PKG" "$SLACKWARE" "$UNION"/$i
       fi
 
 if [ "$SRC" = "truva" ]; then
-         sinstall "$PKG" "$TRUVA" "$UNION"
+         sinstall "$PKG" "$TRUVA" "$UNION"/$i
       fi
    done
    
