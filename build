@@ -61,11 +61,11 @@ for i in $(ls -1 bundles | sort); do
       PKG="$(echo "$LINE" | cut -d: -f 2)"
 
       if [ "$SRC" = "slackware" ]; then
-         sinstall "$PKG" "$SLACKWARE" "$UNION"/$i
+         sinstall "$PKG" "$SLACKWARE" "$UNION/$i"
       fi
 
 if [ "$SRC" = "truva" ]; then
-         sinstall "$PKG" "$TRUVA" "$UNION"/$i
+         sinstall "$PKG" "$TRUVA" "$UNION/$i"
       fi
    done
    
@@ -81,5 +81,5 @@ for i in $(ls -1 | sort); do
    mksquashfs $i /home/moduller/$i.sb -comp xz -Xbcj x86 -b 512k
 done
 
-echo islem Tamamlandı ->> `date`
+echo "		islem Tamamlandı ->> `date` "
 
