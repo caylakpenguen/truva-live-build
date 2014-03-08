@@ -146,7 +146,7 @@ slackware:xf86-video-ati
 slackware:xf86-video-chips
 slackware:xf86-video-cirrus
 slackware:xf86-video-dummy
-slackware:xf86-video-fbdev
+#slackware:xf86-video-fbdev
 slackware:xf86-video-geode
 slackware:xf86-video-glint
 slackware:xf86-video-i128

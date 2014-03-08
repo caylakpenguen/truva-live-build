@@ -1,23 +1,19 @@
 #!/bin/bash
 
 if [ "$(uname -m)" = "x86_64" ]; then
-   SLACKWARE=/mnt/d/slackware/slackware64-current/slackware64/
-   TRUVA=/mnt/sdb1/packages/64bit
+   SLACKWARE=/run/media/atlantis/SlackDVD/slackware/
+   TRUVA=/media/depo/paketler/truva/64bit/
+   SLACKYEU=/media/depo/paketler/slackyeu/64bit/
 else
-   SLACKWARE=/cdrom/slackware/
-   TRUVA=/mnt/sdb1/packages/32bit
+   SLACKWARE=/run/media/atlantis/SlackDVD/slackware/
+   TRUVA=/media/depo/paketler/truva/32bit/
+   SLACKYEU=/media/depo/paketler/slackyeu/32bit/
 fi
 
-LIVEKIT=/mnt/sdb1/linux-live
 EMPTY=/tmp/truva-empty
-UNION=/hedef
+UNION=/media/depo/truva-4.0/sistem/
 
-#-- umount $UNION 2>/dev/null
-#-- rm -Rf $UNION
 mkdir -p $UNION
-
-#-- umount $EMPTY 2>/dev/null
-#-- rm -Rf $EMPTY
 mkdir -p $EMPTY
 
 # Install pakcage from Slackware pkg tree
@@ -61,11 +57,15 @@ for i in $(ls -1 bundles | sort); do
       PKG="$(echo "$LINE" | cut -d: -f 2)"
 
       if [ "$SRC" = "slackware" ]; then
-         sinstall "$PKG" "$SLACKWARE" "$UNION/$i"
+         sinstall "$PKG" "$SLACKWARE" "$UNION"/$i
       fi
 
-if [ "$SRC" = "truva" ]; then
-         sinstall "$PKG" "$TRUVA" "$UNION/$i"
+      if [ "$SRC" = "truva" ]; then
+         sinstall "$PKG" "$TRUVA" "$UNION"/$i
+      fi
+
+      if [ "$SRC" = "slackyeu" ]; then
+         sinstall "$PKG" "$SLACKYEU" "$UNION"/$i
       fi
    done
    
@@ -74,12 +74,12 @@ if [ "$SRC" = "truva" ]; then
 done
 
 # ----------------------
-mkdir -p  /home/moduller
+mkdir -p  /media/depo/truva-4.0/iso/moduller
 cd $UNION
 # make squashfs images
 for i in $(ls -1 | sort); do
-   mksquashfs $i /home/moduller/$i.sb -comp xz -Xbcj x86 -b 512k
+   mksquashfs $i /media/depo/truva-4.0/iso/moduller/$i.sb -comp xz -Xbcj x86 -b 512k
 done
 
-echo "		islem Tamamlandı ->> `date` "
+echo "islem Tamamlandi  `date`"
 
