@@ -1,0 +1,3 @@
+@echo Lade "index.html"...
+@start index.html
+@exit
