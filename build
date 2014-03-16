@@ -50,7 +50,7 @@ union_target_set()
 
 
 for i in $(ls -1 bundles | sort); do
-   mkdir -p "$UNION/$i"
+   mkdir -p "$UNION"/$i
 
    cat ./bundles/$i/pkglist | while read LINE; do
       SRC="$(echo "$LINE" | cut -d: -f 1)"
