@@ -38,7 +38,7 @@ sinstall()
       echo -ne "\\nHata Olustu! Paket Bulunamadi veya  $1 mevcut degil.!\\n"
    else
       echo "  Kurulan Paket -->> $PKG"
-      installpkg -root "$3" "$PKG" >/dev/null
+#      installpkg -root "$3" "$PKG" >/dev/null
    fi
 }
 
@@ -151,5 +151,6 @@ rmdir "$EMPTY"
 
 # make squashfs images
 for i in $(ls -1 bundles | sort); do
-   mksquashfs /tmp/$i /tmp/$i.sb -comp xz -Xbcj x86 -b 512k
+#   mksquashfs /tmp/$i /tmp/$i.sb -comp xz -Xbcj x86 -b 512k
+echo "$i"
 done

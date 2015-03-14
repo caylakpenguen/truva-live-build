@@ -1,0 +1,13 @@
+#!/bin/bash
+# If commandline contains 'xmode' then autoconfigure X and switch to runlevel 4
+# Author: Tomas M <www.slax.org>
+
+if grep -q xmode /proc/cmdline; then
+   # Remove previously used xorg.conf file to start a fresh config.
+   # Slax is started on different computer each time so this must be here.
+   # If you need to keep xorg.conf file, don't use xmode boot parameter.
+   rm /etc/X11/xorg.conf 2>/dev/null
+
+   # switch to runlevel 4 to start kdm
+   telinit 4
+fi

@@ -1,0 +1,7 @@
+- screenshot uploader - k tray cmd
+  - ten tray dat asi taky do activate s gui
+- screenshot - zrusit z menu
+- deactivate je case sensitive ale activate je insensitive. sjednotit, asi oboji udelat insensitive
+- deactivate ma problem deaktivovat biff+comsat, pravdepodobne chyba regexu u plus
+- zkusit aktivovat bluefish, ma problem s aktivaci dependency gtk+3
+- modul crda ma nejakej problem (viz mail);

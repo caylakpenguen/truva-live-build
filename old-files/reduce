@@ -1,0 +1,60 @@
+#!/bin/bash
+
+if [ "$1" = "" ]; then
+   echo "usage: $0 root_directory"
+   exit 1
+fi
+
+CWD=$(pwd)
+
+cd "$1"
+
+find -name ".wh.*" | xargs rm -Rf
+rm -f boot/*
+rmdir mnt/*
+rmdir media/*
+rm -f media/*
+rm -f mnt/README
+
+rm -Rf usr/doc/*
+rm -Rf usr/man/{?????,??,??_??}
+rm -Rf {var,usr}/man/cat* usr/local/man/cat* # NOCACHE
+rm -f usr/man/man{2,3,4,6,9}/*
+rm -f usr/man/man1/perl?*
+rm -f usr/man/* # all files and links but no directories
+rm -f usr/info/*
+
+# Unzip gzipped man pages, so LZMA can compress 2times better.
+# First we gunzip symlinks, which will be overwritten by the content of targets
+# this doesn't matter as mksquashfs will handle duplicate files correctly
+find usr/man -type l -name "*.gz" | xargs gunzip -f
+find usr/man -name "*.gz" | xargs gunzip
+
+# remove locales (translated output of commandline programs)
+find usr/share/locale -name "*.mo" | xargs -r rm
+find usr/share/locale -name "man" | xargs -r rm
+find usr/share/locale -name "LC_MESSAGES" | xargs -r rmdir
+find usr/share/locale | xargs -r rmdir
+find usr/lib{64,}/locale/ -maxdepth 1 | grep -v en_US.utf8 | xargs -r rm -Rf
+
+rm -Rf usr/share/zenmap/locale/*
+rm -Rf usr/share/zenmap/docs/*
+rm -Rf usr/share/zenmap/pixmaps/*
+
+rm -f usr/share/sounds/alsa/*
+rm -f usr/share/mc/help/mc.hlp.*
+echo "[main]" > usr/share/mc/help/mc.hlp
+rm -f usr/share/ncat/ca-bundle.crt
+
+find usr/share/groff/current/font/ -maxdepth 1 | grep dev | grep -v devlatin1 | while read LINE; do
+   rm -Rf "$LINE"
+   ln -s devlatin1 "$LINE"
+done
+
+
+# TODO move to devel!
+rm -Rf usr/include/*
+
+find | xargs file | grep "not stripped" | cut -d : -f 1 | xargs -r strip --strip-unneeded
+
+cd "$CWD"

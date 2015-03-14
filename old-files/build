@@ -1,0 +1,85 @@
+#!/bin/bash
+
+if [ "$(uname -m)" = "x86_64" ]; then
+   SLACKWARE=/run/media/atlantis/SlackDVD/slackware/
+   TRUVA=/media/depo/paketler/truva/64bit/
+   SLACKYEU=/media/depo/paketler/slackyeu/64bit/
+else
+   SLACKWARE=/run/media/atlantis/SlackDVD/slackware/
+   TRUVA=/media/depo/paketler/truva/32bit/
+   SLACKYEU=/media/depo/paketler/slackyeu/32bit/
+fi
+
+EMPTY=/tmp/truva-empty
+UNION=/media/depo/truva-4.0/sistem/
+
+mkdir -p $UNION
+mkdir -p $EMPTY
+
+# Install pakcage from Slackware pkg tree
+# $1 = package name to install
+# $2 = source tree to search for package
+# $3 = target root
+#
+sinstall()
+{
+   local PKG
+   PKG="$(find "$2" | egrep "/$1-[^-]+-[^-]+-[^-]+[.]t[gx]z\$" | head -n 1)"
+
+   if [ "$PKG" = "" ]; then
+      echo -ne "\\nError! Package $1 not found!\\n"
+   else
+      echo Installing $PKG
+      installpkg -root "$3" "$PKG" >/dev/null
+   fi
+}
+
+# change union target storage to $1
+# work on union mount $2
+#
+
+union_target_set()
+{
+   rm -Rf "$1"
+   mkdir -p "$1"
+#    mount -o remount,mod:$(cat /sys/fs/aufs/*/br0 | sed -r "s/=.*//")=ro none "$2" 2>/dev/null
+#    mount -o remount,add:0:"$1" none "$2"
+}
+
+# install all packages for bundles
+
+
+for i in $(ls -1 bundles | sort); do
+   mkdir -p "$UNION"/$i
+
+   cat ./bundles/$i/pkglist | while read LINE; do
+      SRC="$(echo "$LINE" | cut -d: -f 1)"
+      PKG="$(echo "$LINE" | cut -d: -f 2)"
+
+      if [ "$SRC" = "slackware" ]; then
+         sinstall "$PKG" "$SLACKWARE" "$UNION"/$i
+      fi
+
+      if [ "$SRC" = "truva" ]; then
+         sinstall "$PKG" "$TRUVA" "$UNION"/$i
+      fi
+
+      if [ "$SRC" = "slackyeu" ]; then
+         sinstall "$PKG" "$SLACKYEU" "$UNION"/$i
+      fi
+   done
+   
+#    cp -a ./bundles/$i/rootfs/* "$UNION"
+#    sh ./bundles/$i/doinst.sh "$UNION"
+done
+
+# ----------------------
+mkdir -p  /media/depo/truva-4.0/iso/moduller
+cd $UNION
+# make squashfs images
+for i in $(ls -1 | sort); do
+   mksquashfs $i /media/depo/truva-4.0/iso/moduller/$i.sb -comp xz -Xbcj x86 -b 512k
+done
+
+echo "islem Tamamlandi  `date`"
+

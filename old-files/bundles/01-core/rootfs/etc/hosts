@@ -12,8 +12,7 @@
 #
 
 # For loopbacking.
-127.0.0.1		localhost
-127.0.0.1		truvalinux.org.tr truvalinux
+127.0.0.1	localhost
+127.0.0.1	truva.example.net truva
 
 # End of hosts.
-

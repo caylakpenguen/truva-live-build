@@ -1,0 +1,14 @@
+How to build Slax:
+
+First of all, this is not meant for public use. It's my own scripts.
+You can use them, but don't expect much help from me :) Everything
+is undocummented here (yet self-explanatory since it's a bash script).
+
+- in all cases, install current kernel version to the build system and reboot
+- install imagemagick and copy helpers/gzip0.php to path so it's executable
+- edit ./build script to make adjustments for paths to Slackware DVD tree
+- the same for slax packages, can find them on ftp.slax.org (http access only)
+- this build system just creates .sb modules, so when you have them, download 
+  linux live kit and make directory ./sb in it, put all newly created modules
+  to it, copy bootfiles/* over livekit bootfiles and adjust .config file
+  in livekit to reflect slax name
